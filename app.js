@@ -96,6 +96,7 @@ const I18N = {
 
         footer1: "💰 Puedes cambiar la moneda en cualquier momento. Todos los valores se convierten automáticamente.",
         footer2: "✏️ Después de cada registro, los campos se limpian y quedan listos para el siguiente.",
+        footerCreditos: "© 2024 Desarrollado por [Tu Nombre]",
 
         temaClaro: "Cambiar a modo claro", temaOscuro: "Cambiar a modo oscuro",
 
@@ -107,7 +108,7 @@ const I18N = {
         premiumBen3: "📈 Resumen Anual completo",
         premiumBen4: "📄 Exporta a Excel - ideal para tu declaración de renta",
         premiumBen5: "🗓️ Filtros por fecha",
-        premiumDesc3: "Sin suscripciones.",  /* ← CORREGIDO: Se quitó "pago único" */
+        premiumDesc3: "Sin suscripciones.",
         premiumPagoUnico: "PAGO ÚNICO",
         premiumBtnComprar: "Desbloquear Premium",
 
@@ -220,6 +221,7 @@ const I18N = {
 
         footer1: "💰 You can change the currency at any time. All values are converted automatically.",
         footer2: "✏️ After each entry, the fields are cleared and ready for the next one.",
+        footerCreditos: "© 2024 Developed by [Tu Nombre]",
 
         temaClaro: "Switch to light mode", temaOscuro: "Switch to dark mode",
 
@@ -231,7 +233,7 @@ const I18N = {
         premiumBen3: "📈 Full Annual Summary",
         premiumBen4: "📄 Export to Excel - ideal for your tax return",
         premiumBen5: "🗓️ Date filters",
-        premiumDesc3: "No subscriptions.", /* ← CORREGIDO: Se quitó "one-time payment" */
+        premiumDesc3: "No subscriptions.",
         premiumPagoUnico: "ONE-TIME PAYMENT",
         premiumBtnComprar: "Unlock Premium",
 

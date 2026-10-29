@@ -708,6 +708,14 @@ footer {
     padding: 1rem .5rem 0;
 }
 
+.creditos-app {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+    opacity: 0.8;
+}
+
 /* ==================== PREMIUM & MODALES ==================== */
 .feature-lock {
     position: relative;
