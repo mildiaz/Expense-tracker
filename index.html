@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Gastos · Expense Tracker</title>
+<script>
+(function () {
+    try {
+        var guardado = localStorage.getItem('tema_app');
+        if (!guardado) {
+            guardado = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', guardado);
+    } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<div class="contenedor">
+
+    <header>
+        <div class="titulo-app">
+            <h1>💰 <span data-i18n="appTitle">Control de Gastos</span></h1>
+            <p class="subtitulo-app" data-i18n="appSubtitulo">Gestiona tus gastos e ingresos. Tus datos se guardan en este navegador.</p>
+        </div>
+        <div class="controles">
+            <button type="button" id="btnPremiumTop" class="btn-premium-top" style="display: none;">⭐ Hazte Premium</button>
+            <button type="button" id="btnAyuda" class="btn-ayuda-texto" data-i18n="btnAyuda">Instrucciones</button>
+            <button type="button" id="btnIdioma" class="btn-icono-idioma">ES</button>
+            <button type="button" id="btnTema" class="btn-icono" title="Modo oscuro">🌙</button>
+        </div>
+    </header>
+
+    <div class="barra-navegacion">
+        <select id="monedaSelector">
+            <option value="EUR">€ EUR</option>
+            <option value="USD">US$ USD</option>
+            <option value="COP">$ COP</option>
+        </select>
+        <div class="tabs">
+            <button class="tab activo" data-tab="gastos" data-i18n="tabGastos">Gastos</button>
+            <button class="tab" data-tab="ingresos" data-i18n="tabIngresos">Otros Ingresos</button>
+            <button class="tab" data-tab="anual" data-i18n="tabAnual">Resumen Anual 🔒</button>
+        </div>
+    </div>
+
+    <div id="vistaGastos">
+
+        <div class="tarjetas">
+            <div class="tarjeta tarjeta-saldo">
+                <div class="etiqueta" data-i18n="cardIngresoBase">Ingreso base<br><span class='sub-etiqueta'>mes actual</span></div>
+                <input type="text" inputmode="decimal" id="saldoInicialInput" class="input-saldo-base"
+                       placeholder="0.00" data-i18n-ph="phSaldoBase">
+            </div>
+            <div class="tarjeta tarjeta-ingresos">
+                <div class="etiqueta" data-i18n="cardIngresos">Total ingresos<br><span class='sub-etiqueta'>del mes</span></div>
+                <div class="valor" id="totalIngresosValor">€ 0.00</div>
+            </div>
+            <div class="tarjeta tarjeta-gastos">
+                <div class="etiqueta" data-i18n="cardGastos">Gastos<br><span class='sub-etiqueta'>del mes</span></div>
+                <div class="valor" id="totalGastosValor">€ 0.00</div>
+            </div>
+            <div class="tarjeta tarjeta-disponible">
+                <div class="etiqueta" data-i18n="cardDisponible">Saldo<br><span class='sub-etiqueta'>disponible</span></div>
+                <div class="valor"><span id="saldoDisponible">€ 0.00</span></div>
+            </div>
+        </div>
+
+        <div class="panel" id="formGasto">
+            <h3 class="panel-titulo" data-i18n="formGastoTitulo">Gastos</h3>
+            <div class="fila-form">
+                <div class="grupo-form">
+                    <label data-i18n="categoria">Categoría</label>
+                    <select id="catGastoSelect">
+                        <option value="Hogar" data-i18n="catHogar">Hogar</option>
+                        <option value="Supermercado" data-i18n="catSupermercado">Supermercado</option>
+                        <option value="Restaurantes" data-i18n="catRestaurantes">Restaurantes</option>
+                        <option value="Compras" data-i18n="catCompras">Compras</option>
+                        <option value="Transporte" data-i18n="catTransporte">Transporte</option>
+                        <option value="Ocio" data-i18n="catOcio">Ocio</option>
+                        <option value="Salud" data-i18n="catSalud">Salud</option>
+                        <option value="Educación" data-i18n="catEducacion">Educación</option>
+                        <option value="Viajes" data-i18n="catViajes">Viajes</option>
+                        <option value="Mascotas" data-i18n="catMascotas">Mascotas</option>
+                        <option value="OTRA" data-i18n="catOtra">Otra (personalizada)</option>
+                    </select>
+                </div>
+                <div class="grupo-form" id="categoriaPersonalizadaDiv" style="display: none;">
+                    <label data-i18n="catPersonalizada">Categoría personalizada</label>
+                    <input type="text" id="catGastoPersonalizado" placeholder="...">
+                </div>
+                <div class="grupo-form">
+                    <label data-i18n="subcategoria">Subcategoría</label>
+                    <input type="text" id="subcatGasto" placeholder="ej: Alquiler, Luz, Internet...">
+                </div>
+                <div class="grupo-form">
+                    <label data-i18n="fecha">Fecha</label>
+                    <input type="date" id="fechaGasto">
+                </div>
+                <div class="grupo-form">
+                    <label data-i18n="monto">Valor</label>
+                    <input type="number" id="montoGasto" step="any" data-i18n-ph="phMonto" placeholder="0.00">
+                </div>
+            </div>
+            <button id="btnAgregarGasto" class="btn-agregar btn-agregar-gasto" data-i18n="btnAgregarGasto">+ Agregar gasto</button>
+            <button type="button" id="btnCancelarEdicionGasto" class="btn-secundario btn-cancelar-edicion" style="display:none;" data-i18n="btnCancelarEdicion">✕ Cancelar edición</button>
+        </div>
+
+        <div class="panel panel-distribucion" id="panelDistribucion">
+            <h3 data-i18n="distribucionTitulo">Distribución de gastos del mes 🔒</h3>
+            <div id="distribucionBarras"></div>
+        </div>
+
+        <div class="panel panel-filtro" id="panelFiltro">
+            <span class="panel-filtro-titulo" data-i18n="filtroTitulo">Filtrar tabla 🔒</span>
+            <div class="grupo-form">
+                <label data-i18n="desde">Desde</label>
+                <input type="date" id="filtroDesde">
+            </div>
+            <div class="grupo-form">
+                <label data-i18n="hasta">Hasta</label>
+                <input type="date" id="filtroHasta">
+            </div>
+            <button type="button" id="btnLimpiarFiltro" class="btn-secundario" data-i18n="btnLimpiarFiltro">✕ Limpiar filtro</button>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-i18n="thCategoria">Categoría</th>
+                        <th data-i18n="thSubcategoria">Subcategoría</th>
+                        <th data-i18n="thFecha">Fecha</th>
+                        <th data-i18n="thMonto">Valor</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tablaGastosBody"></tbody>
+            </table>
+        </div>
+
+        <div class="panel panel-datos">
+            <div class="panel-datos-header">
+                <span class="panel-datos-titulo" data-i18n="datosTitulo">💾 Copia de seguridad</span>
+                <span class="panel-datos-subtitulo" data-i18n="datosSubtitulo">Protege tus datos o pásalos a otro dispositivo</span>
+            </div>
+            
+            <div class="panel-datos-ayuda">
+                <p class="ayuda-titulo" data-i18n="datosAyudaTitulo"><strong>¿Para qué sirven estos botones?</strong></p>
+                <div class="ayuda-paso">
+                    <p data-i18n="datosPaso1">🛡️ <strong>Guardar copia:</strong> Descarga un archivo en tu PC. No lo abras, solo guárdalo por si acaso (en una USB, en el Drive, etc.).</p>
+                </div>
+                <div class="ayuda-paso">
+                    <p data-i18n="datosPaso2">⏪ <strong>Restaurar datos 🔒:</strong> Si perdiste la información o estás en otro PC, busca ese archivo y la app recuperará todo.</p>
+                </div>
+            </div>
+
+            <div class="panel-datos-botones">
+                <button type="button" id="btnExportarJSON" class="btn-dato">
+                    <span class="btn-dato-icono">🛡️</span>
+                    <span class="btn-dato-cuerpo">
+                        <span class="btn-dato-texto" data-i18n="btnGuardarCopia">Guardar copia de seguridad</span>
+                        <span class="btn-dato-ayuda" data-i18n="ayudaGuardarCopia">Se guardará en tu carpeta de Descargas</span>
+                    </span>
+                </button>
+                <button type="button" id="btnImportar" class="btn-dato">
+                    <span class="btn-dato-icono">⏪</span>
+                    <span class="btn-dato-cuerpo">
+                        <span class="btn-dato-texto" data-i18n="btnRestaurarCopia">Restaurar datos 🔒</span>
+                        <span class="btn-dato-ayuda" data-i18n="ayudaRestaurarCopia">Busca el archivo que guardaste antes</span>
+                    </span>
+                </button>
+                <button type="button" id="btnExportarCSV" class="btn-dato">
+                    <span class="btn-dato-icono">📊</span>
+                    <span class="btn-dato-cuerpo">
+                        <span class="btn-dato-texto" data-i18n="btnExportarExcel">Exportar a Excel 🔒</span>
+                        <span class="btn-dato-ayuda" data-i18n="ayudaExportarExcel">Para analizar o preparar tu declaración de renta</span>
+                    </span>
+                </button>
+            </div>
+            <div class="panel-datos-peligro">
+                <span class="panel-datos-peligro-label" data-i18n="zonaPeligro">Zona peligrosa</span>
+                <button type="button" id="btnReiniciar" class="btn-secundario peligro" data-i18n="btnReiniciar">🗑️ Reiniciar todo</button>
+            </div>
+            <input type="file" id="inputImportarJSON" accept=".json,application/json" hidden>
+        </div>
+    </div>
+
+    <div id="vistaIngresos" style="display: none;">
+        <div class="panel" id="formIngreso">
+            <h3 class="panel-titulo" data-i18n="formIngresoTitulo">Otros Ingresos</h3>
+            <div class="fila-form">
+                <div class="grupo-form">
+                    <label data-i18n="razonIngreso">Razón del ingreso</label>
+                    <input type="text" id="conceptoIngreso" data-i18n-ph="phConceptoIngreso" placeholder="ej: Bono, Venta, Regalo...">
+                </div>
+                <div class="grupo-form">
+                    <label data-i18n="fecha">Fecha</label>
+                    <input type="date" id="fechaIngreso">
+                </div>
+                <div class="grupo-form">
+                    <label data-i18n="monto">Valor</label>
+                    <input type="number" id="montoIngreso" step="any" data-i18n-ph="phMonto" placeholder="0.00">
+                </div>
+            </div>
+            <button id="btnAgregarIngreso" class="btn-agregar btn-agregar-ingreso" data-i18n="btnAgregarIngreso">+ Agregar ingreso</button>
+            <button type="button" id="btnCancelarEdicionIngreso" class="btn-secundario btn-cancelar-edicion" style="display:none;" data-i18n="btnCancelarEdicion">✕ Cancelar edición</button>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-i18n="thRazon">Razón del ingreso</th>
+                        <th data-i18n="thFecha">Fecha</th>
+                        <th data-i18n="thMonto">Valor</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tablaIngresosBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vistaAnual" style="display: none;">
+        <div class="tabla-contenedor">
+            <div style="padding: 0.75rem 1rem;">
+                <label style="font-weight: 600;" data-i18n="anio">📅 Año:</label>
+                <select id="selectorAnio" style="padding: 6px 10px; width: auto; margin-left: .4rem;"></select>
+            </div>
+            <table style="width:100%">
+                <thead>
+                    <tr>
+                        <th data-i18n="thAnio">Año</th>
+                        <th data-i18n="thMes">Mes</th>
+                        <th data-i18n="thIngresoBase">Ingreso base</th>
+                        <th data-i18n="thTotalGastos">Total Gastos</th>
+                        <th data-i18n="thTotalIngresos">Total Ingresos</th>
+                        <th data-i18n="thSaldoNeto">Saldo Neto</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAnualBody"></tbody>
+                <tfoot id="tablaAnualFoot"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p data-i18n="footer1">💰 Puedes cambiar la moneda en cualquier momento. Todos los valores se convierten automáticamente.</p>
+        <p data-i18n="footer2">✏️ Después de cada registro, los campos se limpian y quedan listos para el siguiente.</p>
+    </footer>
+</div>
+
+<!-- ==================== MODAL PREMIUM ==================== -->
+<div id="modalPremium" class="modal-overlay">
+    <div class="modal-content modal-premium">
+        <button type="button" class="modal-close" onclick="cerrarModalPremium()">✕</button>
+        <div class="modal-icon">⭐</div>
+        <h2 data-i18n="premiumTitulo">Hazte Premium</h2>
+        <p class="modal-desc" data-i18n="premiumDesc">Has alcanzado el límite de 10 gastos al mes de la versión gratuita o has intentado usar una función avanzada.</p>
+        
+        <p class="modal-desc" style="margin-bottom: 0.5rem;"><strong data-i18n="premiumDesc2Titulo">Al hacerte Premium obtienes:</strong></p>
+        
+        <ul class="lista-beneficios">
+            <li data-i18n="premiumBen1">✅ Gastos ilimitados</li>
+            <li data-i18n="premiumBen2">📊 Gráfica de barras (¿en qué gastas?)</li>
+            <li data-i18n="premiumBen3">📈 Resumen Anual completo</li>
+            <li data-i18n="premiumBen4">📄 Exporta a Excel - ideal para tu declaración de renta</li>
+            <li data-i18n="premiumBen5">🗓️ Filtros por fecha</li>
+        </ul>
+
+        <p class="modal-desc" style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong data-i18n="premiumDesc3">Sin suscripciones.</strong></p>
+        
+        <div class="modal-precio">
+            <span class="precio-tachado">$19.99</span>
+            <span class="precio-real">$9.99</span>
+            <span class="precio-tag" data-i18n="premiumPagoUnico">PAGO ÚNICO</span>
+        </div>
+        
+        <button type="button" class="btn-agregar btn-agregar-ingreso" style="margin-top: 1rem;" onclick="simularCompra()" data-i18n="premiumBtnComprar">Desbloquear Premium</button>
+        
+        <button type="button" class="btn-secundario" style="margin-top: 0.5rem; width: 100%; font-size: 0.75rem; opacity: 0.7;" onclick="reiniciarPremium()">🔧 [DEV] Volver a modo Gratis</button>
+    </div>
+</div>
+
+<!-- ==================== MODAL AYUDA ==================== -->
+<div id="modalAyuda" class="modal-overlay">
+    <div class="modal-content modal-ayuda">
+        <button type="button" class="modal-close" onclick="cerrarModalAyuda()">✕</button>
+        <h2 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="btnAyuda">Instrucciones</h2>
+        
+        <div class="grid-pasos">
+            <div class="paso-ayuda">
+                <div class="paso-numero">1</div>
+                <div>
+                    <strong data-i18n="ayudaPaso1Titulo">Ingresa tu salario o base</strong>
+                    <p data-i18n="ayudaPaso1Desc">En la primera tarjeta morada, escribe el dinero con el que inicias este mes.</p>
+                </div>
+            </div>
+            
+            <div class="paso-ayuda">
+                <div class="paso-numero">2</div>
+                <div>
+                    <strong data-i18n="ayudaPaso2Titulo">Registra tus gastos</strong>
+                    <p data-i18n="ayudaPaso2Desc">Usa el formulario de abajo. Selecciona la categoría, escribe la subcategoría, selecciona la fecha y escribe el valor. Luego presiona Enter o haz clic en 'Agregar Gasto'.<br><br>Verás que tu registro se guarda automáticamente en la tabla de abajo. Además, los campos se limpian solos y quedan en blanco, listos para hacer el siguiente registro.</p>
+                </div>
+            </div>
+            
+            <div class="paso-ayuda">
+                <div class="paso-numero">3</div>
+                <div>
+                    <strong data-i18n="ayudaPaso3Titulo">Añade otros ingresos</strong>
+                    <p data-i18n="ayudaPaso3Desc">Si recibes un bono, una venta o un dinero extra, regístralo en la pestaña 'Otros Ingresos'.</p>
+                </div>
+            </div>
+            
+            <div class="paso-ayuda">
+                <div class="paso-numero">4</div>
+                <div>
+                    <strong data-i18n="ayudaPaso4Titulo">Revisa tus cuentas</strong>
+                    <p data-i18n="ayudaPaso4Desc">Las tarjetas de colores se actualizan solas. Si quieres ver gráficos, tu historial, o preparar tu declaración de renta, desbloquea la versión Premium.</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="ayuda-recordatorio" data-i18n="ayudaRecordatorio">💡 Recuerda: si cierras esta ventana, siempre puedes volver a abrirla tocando el botón 'Instrucciones' en la parte superior.</p>
+        
+        <button type="button" class="btn-agregar btn-agregar-ingreso" style="margin-top: 1rem;" onclick="cerrarModalAyuda()" data-i18n="ayudaBtnEntendido">¡Entendido, a registrar gastos!</button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
