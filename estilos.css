@@ -48,6 +48,7 @@ body {
     background-attachment: fixed;
     min-height: 100vh;
     transition: background .3s ease, color .3s ease;
+    overflow-x: hidden;
 }
 
 .contenedor {
@@ -908,12 +909,65 @@ body.es-premium .feature-lock::after { display: none; }
 
     .btn-ayuda-texto { padding: 8px 12px; font-size: 0.8rem; }
 
+    /* ====== ARREGLO DEFINITIVO DE LA TABLA (390px) ====== */
+    .tabla-contenedor {
+        width: 100%;
+        overflow-x: hidden; /* Bloquea el scroll a los lados */
+    }
+
+    table {
+        table-layout: fixed; /* Fuerza el ancho al 100% de la pantalla */
+        width: 100% !important; 
+    }
+
+    /* Ocultar la columna de Subcategoría */
     #tablaGastosBody td:nth-child(2),
     #vistaGastos thead th:nth-child(2) { display: none; }
 
-    th, td { padding: 8px 4px; font-size: .85rem; }
-    .acciones-fila { gap: 2px; }
-    .btn-eliminar, .btn-editar { padding: 6px; font-size: .95rem; }
+    /* Anchos exactos: Categoría 35%, Fecha 25%, Valor 25%, Botones 15% */
+    th:nth-child(1), td:nth-child(1) { width: 35%; }
+    th:nth-child(3), td:nth-child(3) { width: 25%; }
+    th:nth-child(4), td:nth-child(4) { width: 25%; }
+    th:nth-child(5), td:nth-child(5) { width: 15%; }
+
+    /* ¡AQUÍ ESTÁ LA MAGIA! Permitir que el texto baje de línea */
+    th {
+        white-space: normal !important; 
+        padding: 6px 2px;
+        font-size: 0.65rem;
+        text-align: center;
+    }
+
+    td {
+        padding: 8px 2px;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    /* Hacer la etiqueta de la categoría más pequeña y con puntos suspensivos */
+    .badge-categoria {
+        font-size: 0.65rem;
+        padding: 3px 4px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+
+    /* Ajustar los botones para que quepan perfectos */
+    .acciones-fila {
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+    }
+    
+    .btn-eliminar, .btn-editar { 
+        padding: 5px; 
+        font-size: 0.8rem; 
+    }
+
+    /* ------------------------------------------------ */
 
     .barra-cabecera { font-size: .8rem; }
     .barra-pista { height: 8px; }
