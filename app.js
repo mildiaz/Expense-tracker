@@ -96,7 +96,7 @@ const I18N = {
 
         footer1: "💰 Puedes cambiar la moneda en cualquier momento. Todos los valores se convierten automáticamente.",
         footer2: "✏️ Después de cada registro, los campos se limpian y quedan listos para el siguiente.",
-        footerCreditos: "© 2024 Desarrollado por [Tu Nombre]",
+        footerCreditos: "© 2024 Desarrollado por Miguel I. Díaz C.",
 
         temaClaro: "Cambiar a modo claro", temaOscuro: "Cambiar a modo oscuro",
 
@@ -221,7 +221,7 @@ const I18N = {
 
         footer1: "💰 You can change the currency at any time. All values are converted automatically.",
         footer2: "✏️ After each entry, the fields are cleared and ready for the next one.",
-        footerCreditos: "© 2024 Developed by [Tu Nombre]",
+        footerCreditos: "© 2024 Developed by Miguel I. Díaz C.",
 
         temaClaro: "Switch to light mode", temaOscuro: "Switch to dark mode",
 
@@ -340,7 +340,7 @@ function reiniciarPremium() {
 
 function abrirModalAyuda() {
     document.getElementById("modalAyuda").classList.add("activo");
-    localStorage.setItem("haVistoInstrucciones", "true"); // Guardar que ya la vio
+    localStorage.setItem("haVistoInstrucciones", "true");
 }
 
 function cerrarModalAyuda() {
@@ -549,7 +549,6 @@ function reiniciarTodo() {
         editandoIngresoId = null;
         guardarDatos();
         
-        // Borrar el récord de que vio las instrucciones
         localStorage.removeItem("haVistoInstrucciones");
 
         document.getElementById("monedaSelector").value = monedaActual;
@@ -560,7 +559,6 @@ function reiniciarTodo() {
         
         alert(t("alertReiniciado"));
         
-        // Mostrar las instrucciones inmediatamente después de reiniciar
         abrirModalAyuda();
     }
 }
@@ -1470,15 +1468,13 @@ function init() {
     actualizarPlaceholderSubcategoria();
     renderizarAnual();
 
-    // Mostrar modal de ayuda inteligente
-    // Solo salta si no hay gastos, no hay ingresos, no hay saldo, Y no la ha visto antes
     const estaVacia = (gastos.length === 0 && ingresos.length === 0 && saldoBaseEUR === null);
     const yaLaVio = localStorage.getItem("haVistoInstrucciones") === "true";
 
     if (estaVacia && !yaLaVio) {
         setTimeout(function() {
             abrirModalAyuda();
-        }, 1500); // 1.5 segundos de espera
+        }, 1500);
     }
 }
 

@@ -716,6 +716,18 @@ footer {
     opacity: 0.8;
 }
 
+.enlace-contacto {
+    color: var(--acento);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.enlace-contacto:hover {
+    text-decoration: underline;
+    color: var(--texto);
+}
+
 /* ==================== PREMIUM & MODALES ==================== */
 .feature-lock {
     position: relative;
